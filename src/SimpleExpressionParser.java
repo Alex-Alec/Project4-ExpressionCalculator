@@ -27,11 +27,76 @@ public class SimpleExpressionParser implements ExpressionParser {
 	protected Expression parseStartExpression (String str) {
 		Expression expression = null;
 		// TODO implement this method, helper methods, classes that implement Expression, etc.
-		// expression = parseAdditiveExpression(str);
-		// if (expression == null) {
-		// 	expression = parseParentheticalExpression(str);
-		// }
+
+		 expression = parseAdditiveExpression(str);
+		 if (expression == null) {
+		 	expression = parseParentheticalExpression(str);
+		 }
 		return expression;
+	}
+
+	protected Expression parseAdditiveExpression (String str) {
+		int parenCounter = 0;
+		for(int i = 0; i < str.length(); i++){
+			if(str.charAt(i) == '('){
+				parenCounter++;
+			} else if(str.charAt(i) == ')'){
+				parenCounter--;
+			}
+			if(parenCounter == 0){
+				if(str.charAt(i) == '+'){
+					return new AdditiveExpression( parseStartExpression(str.substring(0, i-1)),
+							parseStartExpression(str.substring(i+1, str.length()-1)), true);
+				}else if(str.charAt(i) == '-'){
+					return new AdditiveExpression( parseStartExpression(str.substring(0, i-1)),
+							parseStartExpression(str.substring(i+1, str.length()-1)), false);
+				}
+			}
+		}
+		return parseMultiplicativeExpression(str);
+
+//		if(str.length() >= 3 && str.charAt(0) == '(' && str.charAt(str.length()-1) == ')'){
+//
+//		}
+	}
+
+	protected Expression parseMultiplicativeExpression (String str){
+		int parenCounter = 0;
+		for(int i = 0; i < str.length(); i++){
+			if(str.charAt(i) == '('){
+				parenCounter++;
+			} else if(str.charAt(i) == ')'){
+				parenCounter--;
+			}
+			if(parenCounter == 0){
+				if(str.charAt(i) == '*'){
+					return new MultiplicativeExpression(parseStartExpression(str.substring(0, i-1)),
+							parseStartExpression(str.substring(i+1, str.length()-1)), true);
+				}else if(str.charAt(i) == '/'){
+					return new MultiplicativeExpression(parseStartExpression(str.substring(0, i-1)),
+							parseStartExpression(str.substring(i+1, str.length()-1)), false);
+				}
+			}
+		}
+		return parseExponentialExpression(str);
+	}
+
+	protected Expression parseExponentialExpression (String str){
+
+		return parseParentheticalExpression(str);
+	}
+
+	// (x+5) + (x-6)
+	protected Expression parseParentheticalExpression (String str){
+		if( str.equals("")){
+			return null;
+		} else if(str.length() >= 3 && str.charAt(0) == '(' && str.charAt(str.length()-1) == ')'){
+			return new ParentheticalExpression(parseStartExpression(str.substring(1, str.length()-2)));
+		} else if(str.equals("x")){
+			return parseVariableExpression(str);
+		} else {
+			return parseLiteralExpression(str);
+		}
 	}
 
 	protected VariableExpression parseVariableExpression (String str) {
