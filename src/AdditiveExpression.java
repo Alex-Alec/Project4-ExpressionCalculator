@@ -16,6 +16,13 @@ public class AdditiveExpression implements Expression {
 
 	@Override
 	public void convertToString(StringBuilder stringBuilder, int indentLevel) {
-
+		for (int i = 0; i < indentLevel; i++) {
+			stringBuilder.append('\t');
+		}
+		stringBuilder.append("+");
+		stringBuilder.append("\n");
+		child1.convertToString(stringBuilder, indentLevel + 1);
+		stringBuilder.append("\n");
+		child2.convertToString(stringBuilder, indentLevel + 1);
 	}
 }

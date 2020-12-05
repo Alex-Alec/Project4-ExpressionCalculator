@@ -29,10 +29,10 @@ public class SimpleExpressionParser implements ExpressionParser {
 		// TODO implement this method, helper methods, classes that implement Expression, etc.
 
 		 expression = parseAdditiveExpression(str);
-		 if (expression == null) {
-		 	expression = parseParentheticalExpression(str);
-		 }
-		return expression;
+//		 if (expression == null) {
+//		 	expression = parseParentheticalExpression(str);
+//		 }
+		return new StartExpression(expression);
 	}
 
 	protected Expression parseAdditiveExpression (String str) {
@@ -45,11 +45,11 @@ public class SimpleExpressionParser implements ExpressionParser {
 			}
 			if(parenCounter == 0){
 				if(str.charAt(i) == '+'){
-					return new AdditiveExpression( parseStartExpression(str.substring(0, i-1)),
-							parseStartExpression(str.substring(i+1, str.length()-1)), true);
+					return new AdditiveExpression( parseStartExpression(str.substring(0, i)),
+							parseStartExpression(str.substring(i+1)), true);
 				}else if(str.charAt(i) == '-'){
-					return new AdditiveExpression( parseStartExpression(str.substring(0, i-1)),
-							parseStartExpression(str.substring(i+1, str.length()-1)), false);
+					return new AdditiveExpression( parseStartExpression(str.substring(0, i)),
+							parseStartExpression(str.substring(i+1)), false);
 				}
 			}
 		}
@@ -62,6 +62,7 @@ public class SimpleExpressionParser implements ExpressionParser {
 
 	protected Expression parseMultiplicativeExpression (String str){
 		int parenCounter = 0;
+
 		for(int i = 0; i < str.length(); i++){
 			if(str.charAt(i) == '('){
 				parenCounter++;
@@ -70,11 +71,12 @@ public class SimpleExpressionParser implements ExpressionParser {
 			}
 			if(parenCounter == 0){
 				if(str.charAt(i) == '*'){
-					return new MultiplicativeExpression(parseStartExpression(str.substring(0, i-1)),
-							parseStartExpression(str.substring(i+1, str.length()-1)), true);
+					System.out.println(str);
+					return new MultiplicativeExpression(parseStartExpression(str.substring(0, i)),
+							parseStartExpression(str.substring(i+1)), true);
 				}else if(str.charAt(i) == '/'){
-					return new MultiplicativeExpression(parseStartExpression(str.substring(0, i-1)),
-							parseStartExpression(str.substring(i+1, str.length()-1)), false);
+					return new MultiplicativeExpression(parseStartExpression(str.substring(0, i)),
+							parseStartExpression(str.substring(i+1)), false);
 				}
 			}
 		}
@@ -82,7 +84,20 @@ public class SimpleExpressionParser implements ExpressionParser {
 	}
 
 	protected Expression parseExponentialExpression (String str){
-
+		int parenCounter = 0;
+		for(int i = 0; i < str.length(); i++){
+			if(str.charAt(i) == '('){
+				parenCounter++;
+			} else if(str.charAt(i) == ')'){
+				parenCounter--;
+			}
+			if(parenCounter == 0){
+				if(str.charAt(i) == '^'){
+					return new ExponentialExpression(parseStartExpression(str.substring(0, i)),
+							parseStartExpression(str.substring(i+1)));
+				}
+			}
+		}
 		return parseParentheticalExpression(str);
 	}
 
@@ -91,7 +106,7 @@ public class SimpleExpressionParser implements ExpressionParser {
 		if( str.equals("")){
 			return null;
 		} else if(str.length() >= 3 && str.charAt(0) == '(' && str.charAt(str.length()-1) == ')'){
-			return new ParentheticalExpression(parseStartExpression(str.substring(1, str.length()-2)));
+			return new ParentheticalExpression(parseStartExpression(str.substring(1, str.length()-1)));
 		} else if(str.equals("x")){
 			return parseVariableExpression(str);
 		} else {
@@ -100,11 +115,7 @@ public class SimpleExpressionParser implements ExpressionParser {
 	}
 
 	protected VariableExpression parseVariableExpression (String str) {
-		if (str.equals("x")) {
-			// TODO implement the VariableExpression class and uncomment line below
-			// return new VariableExpression();
-		}
-		return null;
+		return new VariableExpression();
 	}
 
 	protected LiteralExpression parseLiteralExpression (String str) {
@@ -150,7 +161,7 @@ public class SimpleExpressionParser implements ExpressionParser {
 
 		if (str.matches(fpRegex)) {
 			// TODO implement the LiteralExpression class and uncomment line below
-			// return new LiteralExpression(str);
+			return new LiteralExpression(str);
 		}
 		return null;
 	}
