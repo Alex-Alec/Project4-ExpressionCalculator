@@ -21,10 +21,10 @@ public class SimpleExpressionParser implements ExpressionParser {
 			throw new ExpressionParseException("Cannot parse expression: " + str);
 		}
 
-		return expression;
+		return new StartExpression(expression);
 	}
 	
-	protected Expression parseStartExpression (String str) {
+	protected Expression parseStartExpression (String str) throws ExpressionParseException {
 		Expression expression = null;
 		// TODO implement this method, helper methods, classes that implement Expression, etc.
 
@@ -32,11 +32,14 @@ public class SimpleExpressionParser implements ExpressionParser {
 //		 if (expression == null) {
 //		 	expression = parseParentheticalExpression(str);
 //		 }
-		return new StartExpression(expression);
+		return expression;
 	}
 
-	protected Expression parseAdditiveExpression (String str) {
+	protected Expression parseAdditiveExpression (String str) throws ExpressionParseException{
 		int parenCounter = 0;
+		if(str.equals("")){
+			throw new ExpressionParseException("Invalid String Exception");
+		}
 		for(int i = 0; i < str.length(); i++){
 			if(str.charAt(i) == '('){
 				parenCounter++;
@@ -60,9 +63,11 @@ public class SimpleExpressionParser implements ExpressionParser {
 //		}
 	}
 
-	protected Expression parseMultiplicativeExpression (String str){
+	protected Expression parseMultiplicativeExpression (String str) throws ExpressionParseException{
 		int parenCounter = 0;
-
+		if(str.equals("")){
+			throw new ExpressionParseException("Invalid String Exception");
+		}
 		for(int i = 0; i < str.length(); i++){
 			if(str.charAt(i) == '('){
 				parenCounter++;
@@ -83,8 +88,11 @@ public class SimpleExpressionParser implements ExpressionParser {
 		return parseExponentialExpression(str);
 	}
 
-	protected Expression parseExponentialExpression (String str){
+	protected Expression parseExponentialExpression (String str) throws ExpressionParseException{
 		int parenCounter = 0;
+		if(str.equals("")){
+			throw new ExpressionParseException("Invalid String Exception");
+		}
 		for(int i = 0; i < str.length(); i++){
 			if(str.charAt(i) == '('){
 				parenCounter++;
@@ -102,9 +110,9 @@ public class SimpleExpressionParser implements ExpressionParser {
 	}
 
 	// (x+5) + (x-6)
-	protected Expression parseParentheticalExpression (String str){
-		if( str.equals("")){
-			return null;
+	protected Expression parseParentheticalExpression (String str) throws ExpressionParseException{
+		if(str.equals("")){
+			throw new ExpressionParseException("Invalid String Exception");
 		} else if(str.length() >= 3 && str.charAt(0) == '(' && str.charAt(str.length()-1) == ')'){
 			return new ParentheticalExpression(parseStartExpression(str.substring(1, str.length()-1)));
 		} else if(str.equals("x")){
@@ -118,7 +126,7 @@ public class SimpleExpressionParser implements ExpressionParser {
 		return new VariableExpression();
 	}
 
-	protected LiteralExpression parseLiteralExpression (String str) {
+	protected LiteralExpression parseLiteralExpression (String str) throws ExpressionParseException {
 		// From https://stackoverflow.com/questions/3543729/how-to-check-that-a-string-is-parseable-to-a-double/22936891:
 		final String Digits     = "(\\p{Digit}+)";
 		final String HexDigits  = "(\\p{XDigit}+)";
@@ -163,6 +171,7 @@ public class SimpleExpressionParser implements ExpressionParser {
 			// TODO implement the LiteralExpression class and uncomment line below
 			return new LiteralExpression(str);
 		}
-		return null;
+		throw new ExpressionParseException("Invalid String Exception");
+		//return null;
 	}
 }
