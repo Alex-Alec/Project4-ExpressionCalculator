@@ -21,7 +21,7 @@ public class SimpleExpressionParser implements ExpressionParser {
 			throw new ExpressionParseException("Cannot parse expression: " + str);
 		}
 
-		return new StartExpression(expression);
+		return new SingleChildExpression(expression, true);
 	}
 	
 	protected Expression parseStartExpression (String str) throws ExpressionParseException {
@@ -48,11 +48,15 @@ public class SimpleExpressionParser implements ExpressionParser {
 			}
 			if(parenCounter == 0){
 				if(str.charAt(i) == '+'){
-					return new AdditiveExpression( parseStartExpression(str.substring(0, i)),
-							parseStartExpression(str.substring(i+1)), true);
+					return new DoubleChildExpression (parseStartExpression(str.substring(0, i)),
+							parseStartExpression(str.substring(i+1)), '+');
+//					return new AdditiveExpression( parseStartExpression(str.substring(0, i)),
+//							parseStartExpression(str.substring(i+1)), true);
 				}else if(str.charAt(i) == '-'){
-					return new AdditiveExpression( parseStartExpression(str.substring(0, i)),
-							parseStartExpression(str.substring(i+1)), false);
+					return new DoubleChildExpression (parseStartExpression(str.substring(0, i)),
+							parseStartExpression(str.substring(i+1)), '-');
+//					return new AdditiveExpression( parseStartExpression(str.substring(0, i)),
+//							parseStartExpression(str.substring(i+1)), false);
 				}
 			}
 		}
@@ -77,11 +81,15 @@ public class SimpleExpressionParser implements ExpressionParser {
 			if(parenCounter == 0){
 				if(str.charAt(i) == '*'){
 					System.out.println(str);
-					return new MultiplicativeExpression(parseStartExpression(str.substring(0, i)),
-							parseStartExpression(str.substring(i+1)), true);
+					return new DoubleChildExpression (parseStartExpression(str.substring(0, i)),
+							parseStartExpression(str.substring(i+1)), '*');
+//					return new MultiplicativeExpression(parseStartExpression(str.substring(0, i)),
+//							parseStartExpression(str.substring(i+1)), true);
 				}else if(str.charAt(i) == '/'){
-					return new MultiplicativeExpression(parseStartExpression(str.substring(0, i)),
-							parseStartExpression(str.substring(i+1)), false);
+					return new DoubleChildExpression (parseStartExpression(str.substring(0, i)),
+							parseStartExpression(str.substring(i+1)), '/');
+//					return new MultiplicativeExpression(parseStartExpression(str.substring(0, i)),
+//							parseStartExpression(str.substring(i+1)), false);
 				}
 			}
 		}
@@ -101,8 +109,10 @@ public class SimpleExpressionParser implements ExpressionParser {
 			}
 			if(parenCounter == 0){
 				if(str.charAt(i) == '^'){
-					return new ExponentialExpression(parseStartExpression(str.substring(0, i)),
-							parseStartExpression(str.substring(i+1)));
+					return new DoubleChildExpression (parseStartExpression(str.substring(0, i)),
+							parseStartExpression(str.substring(i+1)), '^');
+//					return new ExponentialExpression(parseStartExpression(str.substring(0, i)),
+//							parseStartExpression(str.substring(i+1)));
 				}
 			}
 		}
@@ -114,7 +124,7 @@ public class SimpleExpressionParser implements ExpressionParser {
 		if(str.equals("")){
 			throw new ExpressionParseException("Invalid String Exception");
 		} else if(str.length() >= 3 && str.charAt(0) == '(' && str.charAt(str.length()-1) == ')'){
-			return new ParentheticalExpression(parseStartExpression(str.substring(1, str.length()-1)));
+			return new SingleChildExpression(parseStartExpression(str.substring(1, str.length()-1)));
 		} else if(str.equals("x")){
 			return parseVariableExpression(str);
 		} else {
@@ -122,11 +132,11 @@ public class SimpleExpressionParser implements ExpressionParser {
 		}
 	}
 
-	protected VariableExpression parseVariableExpression (String str) {
-		return new VariableExpression();
+	protected Expression parseVariableExpression (String str) {
+		return new NoChildExpression();
 	}
 
-	protected LiteralExpression parseLiteralExpression (String str) throws ExpressionParseException {
+	protected Expression parseLiteralExpression (String str) throws ExpressionParseException {
 		// From https://stackoverflow.com/questions/3543729/how-to-check-that-a-string-is-parseable-to-a-double/22936891:
 		final String Digits     = "(\\p{Digit}+)";
 		final String HexDigits  = "(\\p{XDigit}+)";
@@ -169,7 +179,7 @@ public class SimpleExpressionParser implements ExpressionParser {
 
 		if (str.matches(fpRegex)) {
 			// TODO implement the LiteralExpression class and uncomment line below
-			return new LiteralExpression(str);
+			return new NoChildExpression(str);
 		}
 		throw new ExpressionParseException("Invalid String Exception");
 		//return null;
