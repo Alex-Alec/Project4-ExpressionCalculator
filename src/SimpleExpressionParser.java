@@ -92,10 +92,26 @@ public class SimpleExpressionParser implements ExpressionParser {
 			if(parenCounter == 0){
 
 				// Check if the operator matches an additive expression
-				if(str.charAt(i) == '+' || str.charAt(i) == '-'){
+				if(str.charAt(i) == '+'){
 					return new DoubleChildExpression (parseStartExpression(str.substring(0, i)),
 							parseStartExpression(str.substring(i+1)), str.charAt(i));
 
+				} else if(str.charAt(i) == '-'){
+					if(i - 1 == 0){
+						continue;
+					} else if(i+1 < str.length()){
+						if(str.charAt(i+1) == '.'){
+							continue;
+						}
+						try {
+							parseLiteralExpression(str.substring(i, i+2));
+						} catch(ExpressionParseException e){ // not a literal
+							throw new ExpressionParseException("Invalid String Exception");
+						}
+						continue;
+					}
+					return new DoubleChildExpression (parseStartExpression(str.substring(0, i)),
+							parseStartExpression(str.substring(i+1)), str.charAt(i));
 				}
 			}
 		}
