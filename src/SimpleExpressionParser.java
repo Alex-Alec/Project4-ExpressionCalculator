@@ -1,7 +1,7 @@
 import java.util.function.*;
 
 /**
- * TODO: Implement this class.
+ * SimpleExpressionParser Class
  */
 public class SimpleExpressionParser implements ExpressionParser {
 	/*
@@ -14,6 +14,13 @@ public class SimpleExpressionParser implements ExpressionParser {
 	 * L -> <float>
 	 * V -> x
 	 */
+
+	/**
+	 * Parses using the given grammar
+	 * @param str the string to parse into an expression tree
+	 * @return Expression representing the expression
+	 * @throws ExpressionParseException
+	 */
 	public Expression parse (String str) throws ExpressionParseException {
 		str = str.replaceAll(" ", "");
 		Expression expression = parseStartExpression(str);
@@ -21,121 +28,183 @@ public class SimpleExpressionParser implements ExpressionParser {
 			throw new ExpressionParseException("Cannot parse expression: " + str);
 		}
 
-		return new SingleChildExpression(expression, true);
+		return new SingleChildExpression(expression, true); // Add a start Expression at the beginning for the extra newline
 	}
-	
-	protected Expression parseStartExpression (String str) throws ExpressionParseException {
-		Expression expression = null;
-		// TODO implement this method, helper methods, classes that implement Expression, etc.
 
-		 expression = parseAdditiveExpression(str);
+	/**
+	 * Parses the start expression into additive or parenthetical
+	 * @param str Remaining String to be Parsed
+	 * @return Parsed exception
+	 * @throws ExpressionParseException
+	 */
+	protected Expression parseStartExpression (String str) throws ExpressionParseException {
+		 Expression expression = parseAdditiveExpression(str);
 //		 if (expression == null) {
 //		 	expression = parseParentheticalExpression(str);
 //		 }
 		return expression;
 	}
 
+	/**
+	 * Parse the Additive Expression
+	 * @param str Remaining String to be Parsed
+	 * @return Parsed expression
+	 * @throws ExpressionParseException
+	 */
 	protected Expression parseAdditiveExpression (String str) throws ExpressionParseException{
+
+		// Count of open Parenthesis
 		int parenCounter = 0;
+
+		// If given an empty string, throw exception
 		if(str.equals("")){
 			throw new ExpressionParseException("Invalid String Exception");
 		}
+
+		// Loops through the string
 		for(int i = 0; i < str.length(); i++){
+
+			// Increment or decrement the counter based on open or closed parenthesis
 			if(str.charAt(i) == '('){
 				parenCounter++;
 			} else if(str.charAt(i) == ')'){
 				parenCounter--;
 			}
+
+			// If the current char is outside of all parenthesis
 			if(parenCounter == 0){
-				if(str.charAt(i) == '+'){
+
+				// Check if the operator matches an additive expression
+				if(str.charAt(i) == '+' || str.charAt(i) == '-'){
 					return new DoubleChildExpression (parseStartExpression(str.substring(0, i)),
-							parseStartExpression(str.substring(i+1)), '+');
-//					return new AdditiveExpression( parseStartExpression(str.substring(0, i)),
-//							parseStartExpression(str.substring(i+1)), true);
-				}else if(str.charAt(i) == '-'){
-					return new DoubleChildExpression (parseStartExpression(str.substring(0, i)),
-							parseStartExpression(str.substring(i+1)), '-');
-//					return new AdditiveExpression( parseStartExpression(str.substring(0, i)),
-//							parseStartExpression(str.substring(i+1)), false);
+							parseStartExpression(str.substring(i+1)), str.charAt(i));
+
 				}
 			}
 		}
-		return parseMultiplicativeExpression(str);
 
-//		if(str.length() >= 3 && str.charAt(0) == '(' && str.charAt(str.length()-1) == ')'){
-//
-//		}
+		// If it isn't an additive expression, try the multiplicative expression
+		return parseMultiplicativeExpression(str);
 	}
 
+	/**
+	 * Parse the Multiplicative Expression
+	 * @param str Remaining String to be Parsed
+	 * @return Parsed expression
+	 * @throws ExpressionParseException
+	 */
 	protected Expression parseMultiplicativeExpression (String str) throws ExpressionParseException{
+		// Count of open Parenthesis
 		int parenCounter = 0;
+
+		// If given an empty string, throw exception
 		if(str.equals("")){
 			throw new ExpressionParseException("Invalid String Exception");
 		}
+
+		// Loops through the string
 		for(int i = 0; i < str.length(); i++){
+
+			// Increment or decrement the counter based on open or closed parenthesis
 			if(str.charAt(i) == '('){
 				parenCounter++;
 			} else if(str.charAt(i) == ')'){
 				parenCounter--;
 			}
+
+			// If the current char is outside of all parenthesis
 			if(parenCounter == 0){
-				if(str.charAt(i) == '*'){
-					System.out.println(str);
+
+				// Check if the operator matches an multiplicative expression
+				if(str.charAt(i) == '*' || str.charAt(i) == '/'){
 					return new DoubleChildExpression (parseStartExpression(str.substring(0, i)),
-							parseStartExpression(str.substring(i+1)), '*');
-//					return new MultiplicativeExpression(parseStartExpression(str.substring(0, i)),
-//							parseStartExpression(str.substring(i+1)), true);
-				}else if(str.charAt(i) == '/'){
-					return new DoubleChildExpression (parseStartExpression(str.substring(0, i)),
-							parseStartExpression(str.substring(i+1)), '/');
-//					return new MultiplicativeExpression(parseStartExpression(str.substring(0, i)),
-//							parseStartExpression(str.substring(i+1)), false);
+							parseStartExpression(str.substring(i+1)), str.charAt(i));
+
 				}
 			}
 		}
+
+		// If it isn't an additive expression, try the Exponential expression
 		return parseExponentialExpression(str);
 	}
 
+	/**
+	 * Parse the Exponential Expression
+	 * @param str Remaining String to be Parsed
+	 * @return Parsed expression
+	 * @throws ExpressionParseException
+	 */
 	protected Expression parseExponentialExpression (String str) throws ExpressionParseException{
+		// Count of open Parenthesis
 		int parenCounter = 0;
+
+		// If given an empty string, throw exception
 		if(str.equals("")){
 			throw new ExpressionParseException("Invalid String Exception");
 		}
+
+		// Loops through the string
 		for(int i = 0; i < str.length(); i++){
+
+			// Increment or decrement the counter based on open or closed parenthesis
 			if(str.charAt(i) == '('){
 				parenCounter++;
 			} else if(str.charAt(i) == ')'){
 				parenCounter--;
 			}
+
+			// If the current char is outside of all parenthesis
 			if(parenCounter == 0){
+
+				// Check if the operator matches an multiplicative expression
 				if(str.charAt(i) == '^'){
 					return new DoubleChildExpression (parseStartExpression(str.substring(0, i)),
 							parseStartExpression(str.substring(i+1)), '^');
-//					return new ExponentialExpression(parseStartExpression(str.substring(0, i)),
-//							parseStartExpression(str.substring(i+1)));
 				}
 			}
 		}
+
+		// If it isn't an additive expression, try the Exponential expression
 		return parseParentheticalExpression(str);
 	}
 
-	// (x+5) + (x-6)
+	/**
+	 * Parse the Parenthetical Expression
+	 * @param str Remaining String to be Parsed
+	 * @return Parsed expression
+	 * @throws ExpressionParseException
+	 */
 	protected Expression parseParentheticalExpression (String str) throws ExpressionParseException{
-		if(str.equals("")){
+
+		if(str.equals("")){ // Empty string means an exception
 			throw new ExpressionParseException("Invalid String Exception");
-		} else if(str.length() >= 3 && str.charAt(0) == '(' && str.charAt(str.length()-1) == ')'){
+
+		} else if(str.length() >= 3 && str.charAt(0) == '(' && str.charAt(str.length()-1) == ')'){ // Checks if this is a Parenthetical Expression
 			return new SingleChildExpression(parseStartExpression(str.substring(1, str.length()-1)));
-		} else if(str.equals("x")){
+
+		} else if(str.equals("x")){ // Check if this is a variable expression
 			return parseVariableExpression(str);
-		} else {
+
+		} else { // Otherwise it's a literal expression
 			return parseLiteralExpression(str);
 		}
 	}
 
+	/**
+	 * Parse Variable Expression
+	 * @param str Expression
+	 * @return new NoChildExpression
+	 */
 	protected Expression parseVariableExpression (String str) {
 		return new NoChildExpression();
 	}
 
+	/**
+	 * Parse Literal Expression
+	 * @param str
+	 * @return
+	 * @throws ExpressionParseException
+	 */
 	protected Expression parseLiteralExpression (String str) throws ExpressionParseException {
 		// From https://stackoverflow.com/questions/3543729/how-to-check-that-a-string-is-parseable-to-a-double/22936891:
 		final String Digits     = "(\\p{Digit}+)";
@@ -178,10 +247,8 @@ public class SimpleExpressionParser implements ExpressionParser {
 		    "[\\x00-\\x20]*");// Optional trailing "whitespace"
 
 		if (str.matches(fpRegex)) {
-			// TODO implement the LiteralExpression class and uncomment line below
 			return new NoChildExpression(str);
 		}
 		throw new ExpressionParseException("Invalid String Exception");
-		//return null;
 	}
 }
