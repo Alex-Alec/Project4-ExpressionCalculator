@@ -38,11 +38,28 @@ public class SimpleExpressionParser implements ExpressionParser {
 	 * @throws ExpressionParseException
 	 */
 	protected Expression parseStartExpression (String str) throws ExpressionParseException {
-		 Expression expression = parseAdditiveExpression(str);
-//		 if (expression == null) {
-//		 	expression = parseParentheticalExpression(str);
-//		 }
-		return expression;
+
+		// Check if it's a parenthetical expression, could ignore, but grammar requires it
+		if(!str.equals("")&& str.charAt(0) == '('){
+			int parenCounter = 1;
+			for(int i = 1; i < str.length();i++){
+				if(str.charAt(i) == '('){
+					parenCounter++;
+				} else if(str.charAt(i) == ')'){
+					parenCounter--;
+				}
+				if(parenCounter == 0 && i != str.length()-1){
+					break;
+				}
+
+				if(parenCounter == 0 && i == str.length()-1 && str.charAt(i)== ')'){
+					return parseParentheticalExpression(str);
+				}
+			}
+		}
+
+		// Otherwise start from additive expression
+		return parseAdditiveExpression(str);
 	}
 
 	/**
